@@ -1,0 +1,331 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #050505;
+  --panel: rgba(10, 12, 18, 0.72);
+  --text: #eef6ff;
+  --muted: rgba(214, 226, 239, 0.7);
+  --line: rgba(104, 219, 255, 0.28);
+  --electric: #63d4ff;
+  --cyan: #5ef0ff;
+  --purple: #8b5cf6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(94, 240, 255, 0.1), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 15%, rgba(139, 92, 246, 0.1), transparent),
+    radial-gradient(ellipse 50% 30% at 20% 60%, rgba(94, 240, 255, 0.05), transparent),
+    linear-gradient(180deg, #050505 0%, #070809 55%, #050505 100%);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  letter-spacing: 0.01em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(94, 240, 255, 0.22);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  letter-spacing: 0.01em;
+}
+
+.font-ui {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.font-numbers {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* ─── Glassmorphism ─── */
+.glass {
+  background: linear-gradient(160deg, rgba(18, 22, 32, 0.88), rgba(10, 12, 18, 0.7));
+  backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid rgba(140, 230, 255, 0.07);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(99, 212, 255, 0.07),
+    0 0 28px rgba(99, 212, 255, 0.05),
+    0 0 56px rgba(139, 92, 246, 0.03);
+}
+
+/* ─── Grid background ─── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 80% at center, black 20%, transparent 85%);
+}
+
+/* ─── Container ─── */
+.container-pad {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.typing-slot {
+  min-width: 0;
+}
+
+/* ─── Metal border ─── */
+.metal-border {
+  position: relative;
+}
+
+.metal-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 0.5px;
+  background: linear-gradient(
+    135deg,
+    rgba(94, 240, 255, 0.45),
+    rgba(99, 212, 255, 0.18),
+    rgba(139, 92, 246, 0.16),
+    rgba(255, 255, 255, 0.04)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  box-shadow:
+    0 0 10px rgba(94, 240, 255, 0.1),
+    0 0 24px rgba(139, 92, 246, 0.06);
+}
+
+/* ─── Gradient text ─── */
+.gradient-text {
+  background: linear-gradient(130deg, #5ef0ff 0%, #63d4ff 40%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(135deg, #f0abfc, #c084fc, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Orbit animations ─── */
+@keyframes spinCw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinCcw {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.orbit-cw  { animation: spinCw  28s linear infinite; transform-origin: center; }
+.orbit-ccw { animation: spinCcw 38s linear infinite; transform-origin: center; }
+.orbit-cw-fast { animation: spinCw 14s linear infinite; transform-origin: center; }
+
+/* ─── Float animations ─── */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-9px); }
+}
+
+.float-1 { animation: floatY 4.0s ease-in-out 0.0s infinite; }
+.float-2 { animation: floatY 5.0s ease-in-out 0.8s infinite; }
+.float-3 { animation: floatY 4.5s ease-in-out 1.6s infinite; }
+.float-4 { animation: floatY 5.5s ease-in-out 2.4s infinite; }
+
+/* ─── Scanner line ─── */
+@keyframes scanline {
+  0%   { top: -5%;  opacity: 0; }
+  5%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: 105%; opacity: 0; }
+}
+
+.scanner {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -5%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(94, 240, 255, 0.9),
+    rgba(180, 240, 255, 1),
+    rgba(94, 240, 255, 0.9),
+    transparent
+  );
+  animation: scanline 7s ease-in-out 2.5s infinite;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+/* ─── Ray / light burst effect ─── */
+.hero-rays {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-rays::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140%;
+  height: 60%;
+  background: conic-gradient(
+    from -20deg at 50% 0%,
+    transparent 0deg,
+    rgba(94, 240, 255, 0.05) 8deg,
+    transparent 17deg,
+    rgba(139, 92, 246, 0.04) 30deg,
+    transparent 39deg,
+    rgba(94, 240, 255, 0.04) 52deg,
+    transparent 61deg,
+    rgba(99, 212, 255, 0.04) 74deg,
+    transparent 83deg
+  );
+  animation: rayPulse 6s ease-in-out infinite;
+}
+
+@keyframes rayPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* ─── Profile glow ring ─── */
+.profile-glow {
+  box-shadow:
+    0 0 0 1.5px rgba(94, 240, 255, 0.35),
+    0 0 40px rgba(94, 240, 255, 0.18),
+    0 0 80px rgba(94, 240, 255, 0.07),
+    0 0 0 3px rgba(139, 92, 246, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.65);
+}
+
+/* ─── Animated gradient border ─── */
+@keyframes borderFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-border-anim {
+  position: relative;
+  border-radius: inherit;
+}
+
+.gradient-border-anim::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #5ef0ff, #8b5cf6, #63d4ff, #8b5cf6, #5ef0ff);
+  background-size: 300% 300%;
+  animation: borderFlow 5s linear infinite;
+  z-index: -1;
+}
+
+/* ─── Hover card lift ─── */
+.card-hover {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(99, 212, 255, 0.12),
+    0 0 32px rgba(99, 212, 255, 0.08);
+}
+
+/* ─── Skill chip ─── */
+.skill-chip {
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.skill-chip:hover {
+  transform: translateY(-2px);
+}
+
+/* ─── No scrollbar ─── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Responsive overrides ─── */
+@media (max-width: 640px) {
+  .container-pad {
+    width: min(100%, calc(100% - 20px));
+  }
+
+  .grid-bg {
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at center, black 20%, transparent 86%);
+  }
+
+  h1 { font-size: clamp(2.2rem, 10vw, 3.4rem); line-height: 0.98; }
+  h2 { font-size: clamp(1.55rem, 7vw, 2.1rem); line-height: 1.08; }
+  h3 { font-size: clamp(1.15rem, 5vw, 1.5rem); line-height: 1.15; }
+
+  .glass {
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(99, 212, 255, 0.05),
+      0 0 16px rgba(99, 212, 255, 0.04);
+  }
+
+  .metal-border::before {
+    padding: 0.35px;
+    background: linear-gradient(135deg, rgba(94,240,255,0.34), rgba(99,212,255,0.12), rgba(139,92,246,0.1), rgba(255,255,255,0.03));
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container-pad { width: min(1080px, calc(100% - 28px)); }
+  .grid-bg { background-size: 48px 48px; }
+}
+
+@media (min-width: 1024px) {
+  .typing-slot { min-width: 26ch; }
+}
