@@ -35,6 +35,7 @@ async function ensureStore() {
 async function readStore(): Promise<VisitorStoreShape> {
   try {
     const raw = await readFile(STORE_PATH, 'utf8');
+    if (!raw.trim()) return { visits: [] };
     const parsed = JSON.parse(raw) as Partial<VisitorStoreShape>;
     return { visits: Array.isArray(parsed.visits) ? parsed.visits : [] };
   } catch {

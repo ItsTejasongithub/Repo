@@ -3,12 +3,17 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
-export function AvatarCanvas() {
+interface AvatarCanvasProps {
+  shouldStartIntro?: boolean;
+}
+
+export function AvatarCanvas({ shouldStartIntro = true }: AvatarCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef    = useRef<HTMLCanvasElement>(null);
   const floatingRef  = useRef(false);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [isFloating, setIsFloating] = useState(false);
+  const introStartedRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -82,8 +87,8 @@ export function AvatarCanvas() {
     let pointerClientX = 0, pointerClientY = 0, hasCursor = false;
     const BASE_MODEL_YAW = -Math.PI / 2;
 
-    // Intro state: walk in from one side, settle at center, then greet.
-    let introPhase: 'walk' | 'center' | 'greet' | 'idle' | 'preview' = 'walk';
+    // Intro state: wait in bind pose until the entry button starts the walk.
+    let introPhase: 'rotate' | 'walk' | 'center' | 'greet' | 'idle' | 'preview' = shouldStartIntro ? 'walk' : 'rotate';
     const introStartPos = new THREE.Vector3();
     const introEndPos = new THREE.Vector3(0, 0, 0);
     let introProgress = 0;
@@ -126,6 +131,9 @@ export function AvatarCanvas() {
     let clickEmoteTimer = 0;
 
     let walkStopped = false;
+    let greetingVoiceTriggered = false;
+    let shouldBeginIntroNow = false; // Tracks if portfolio-begin event was fired
+    let portfolioBeginFired = false; // Double-check that portfolio-begin was actually fired
 
     // Draw a soft glowing 5-point star into a canvas texture (used by the
     // dizzy halo sprites). One texture is shared by every star.
@@ -308,7 +316,9 @@ export function AvatarCanvas() {
             } else {
               walkAction = mixer.clipAction(clips[walkIdx]);
               walkAction.setLoop(THREE.LoopRepeat, Infinity);
-              walkAction.reset().fadeIn(0.2).play();
+              if (shouldStartIntro) {
+                walkAction.reset().fadeIn(0.2).play();
+              }
 
               idleAction = mixer.clipAction(clips[idleIdx]);
               idleAction.setLoop(THREE.LoopRepeat, Infinity);
@@ -372,9 +382,15 @@ export function AvatarCanvas() {
               introProgress = 0;
               centerHold = 0.32;
               walkStopped = false;
-              introPhase = 'walk';
-              avatarRoot.position.copy(introStartPos);
-              faceCenter();
+              if (shouldStartIntro) {
+                introPhase = 'walk';
+                avatarRoot.position.copy(introStartPos);
+                faceCenter();
+              } else {
+                introPhase = 'rotate';
+                avatarRoot.position.set(0, 0, 0);
+                modelRoot.rotation.y = BASE_MODEL_YAW;
+              }
             }
           }
 
@@ -455,6 +471,13 @@ export function AvatarCanvas() {
       }, Math.max(400, (dur - 0.2) * 1000));
     };
     window.addEventListener('click', onAvatarClick);
+
+    // Listen for portfolio-begin event to start intro animation - STRICT CHECK
+    const onPortfolioBegin = () => {
+      portfolioBeginFired = true;
+      shouldBeginIntroNow = true;
+    };
+    window.addEventListener('portfolio-begin', onPortfolioBegin);
 
     // Pre-allocated helpers — avoids per-frame GC pressure.
     const _yawAxis   = new THREE.Vector3(0, 1, 0);
@@ -554,11 +577,37 @@ export function AvatarCanvas() {
         if (base) base.copy(bone.quaternion);
       }
 
-      const introLocked = introPhase === 'walk' || introPhase === 'center' || introPhase === 'greet';
+      // Start intro animation ONLY when user clicks "Begin" button (strict check)
+      if (portfolioBeginFired && shouldBeginIntroNow && (introPhase === 'rotate' || introPhase === 'idle') && mixer && walkAction && idleAction) {
+        shouldBeginIntroNow = false; // Only transition once
+        introPhase = 'walk';
+        introStartPos.set(
+          sessionStorage.getItem('avatarIntroSide') === 'left' ? -4 : 4,
+          0,
+          0
+        );
+        introProgress = 0;
+        introDuration = 2;
+        centerHold = 0.32;
+        walkStopped = false;
+        avatarRoot.position.copy(introStartPos);
+        faceCenter();
+        walkAction.reset().fadeIn(0.2).play();
+      }
+
+      const introLocked = introPhase === 'walk' || introPhase === 'center' || introPhase === 'greet' || introPhase === 'rotate';
       // Let the dizzy / click emotes drive the head — no cursor look-at on top.
       const lookLocked = introLocked || dizzyActive || clickEmoteActive;
 
-      if (introPhase === 'walk' && introDuration > 0) {
+      // Waiting state: bind/T pose showcase spin only. No animation before Begin.
+      if (introPhase === 'rotate' && modelRoot) {
+        modelRoot.rotation.y += dt * 0.5;
+        if (activeBaseAction) {
+          activeBaseAction.stop();
+          activeBaseAction = null;
+        }
+        avatarRoot.position.set(0, 0, 0);
+      } else if (introPhase === 'walk' && introDuration > 0) {
         introProgress = Math.min(1, introProgress + dt / introDuration);
         const eased = 1 - Math.pow(1 - introProgress, 3);
         avatarRoot.position.lerpVectors(introStartPos, introEndPos, eased);
@@ -579,6 +628,13 @@ export function AvatarCanvas() {
         centerHold -= dt;
         avatarRoot.position.set(0, 0, 0);
         faceCenter();
+
+        // Trigger voice early so it plays BEFORE the waving animation starts
+        if (centerHold <= 0.15 && !greetingVoiceTriggered) {
+          greetingVoiceTriggered = true;
+          window.dispatchEvent(new Event('portfolio-avatar-greeting'));
+        }
+
         if (centerHold <= 0 && mixer && greetAction && idleAction) {
           introPhase = 'greet';
           idleAction.fadeOut(0.2);
@@ -779,6 +835,7 @@ export function AvatarCanvas() {
       document.removeEventListener('mouseleave', onMouseLeave);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('click', onAvatarClick);
+      window.removeEventListener('portfolio-begin', onPortfolioBegin);
       if (dizzyHalo) {
         dizzyHalo.group.traverse((o: any) => o.geometry?.dispose?.());
         for (const m of dizzyHalo.mats) m.dispose();

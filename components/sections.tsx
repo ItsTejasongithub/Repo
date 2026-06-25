@@ -20,7 +20,11 @@ const blogCategory: Record<string, string> = {
 };
 
 /* ─────────────────────────── HERO VISUAL ─────────────────────────── */
-export function HeroVisual() {
+interface HeroVisualProps {
+  shouldStartIntro?: boolean;
+}
+
+export function HeroVisual({ shouldStartIntro = true }: HeroVisualProps) {
   return (
     <div className="relative flex items-center justify-center py-6 lg:py-0">
       {/* Ambient glow blobs */}
@@ -37,7 +41,7 @@ export function HeroVisual() {
         <div className="pointer-events-none absolute bottom-10 left-1/2 -translate-x-1/2 h-10 w-48 rounded-full bg-cyan-400/20 blur-[22px]" />
 
         {/* 3D Avatar — fills the container */}
-        <AvatarCanvas />
+        <AvatarCanvas shouldStartIntro={shouldStartIntro} />
 
         {/* ── Status badge ── */}
         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-10">

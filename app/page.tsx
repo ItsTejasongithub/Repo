@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import {
   HeroVisual,
   EngineeringSnapshot,
@@ -12,14 +15,19 @@ import {
 } from '@/components/sections';
 import { TypingHeadline } from '@/components/typing-headline';
 import { ThreeAmbient } from '@/components/three-ambient';
+import { EntryScreen } from '@/components/entry-screen';
 import { stats } from '@/lib/site-data';
 
 export default function Page() {
+  const [hasBegun, setHasBegun] = useState(false);
+
   return (
     <main className="relative overflow-x-hidden">
+      {/* Entry screen — shows on initial load, hidden after first click */}
+      {!hasBegun && <EntryScreen onBegin={() => setHasBegun(true)} />}
 
       {/* ── Hero section ── */}
-      <section className="relative min-h-screen">
+      <section className="relative min-h-screen" data-voice-section="hero">
         {/* Full-screen Three.js particle field */}
         <div className="pointer-events-none absolute inset-0 z-0">
           <ThreeAmbient />
@@ -40,7 +48,7 @@ export default function Page() {
 
           {/* ── Top: Avatar — takes the full upper portion ── */}
           <div className="relative z-20 flex flex-1 items-end justify-center pt-16">
-            <HeroVisual />
+            <HeroVisual shouldStartIntro={hasBegun} />
           </div>
 
           {/* ── Bottom: Text content ── */}
@@ -109,13 +117,13 @@ export default function Page() {
 
       {/* ── All other sections ── */}
       <div className="container-pad space-y-24 pb-24">
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="snapshot">
           <EngineeringSnapshot />
         </div>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="skills">
           <SkillsMatrix />
         </div>
-        <section id="projects" className="space-y-8" data-reveal data-zigzag>
+        <section id="projects" className="space-y-8" data-reveal data-zigzag data-voice-section="projects">
           <div>
             <p className="text-xs uppercase tracking-[0.4em] text-electric/70">Project Command Center</p>
             <h2 className="mt-3 text-3xl font-semibold text-white">
@@ -124,22 +132,22 @@ export default function Page() {
           </div>
           <ProjectsSection />
         </section>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="architecture">
           <SystemArchitectures />
         </div>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="timeline">
           <EngineeringTimeline />
         </div>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="labs">
           <Labs />
         </div>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="github">
           <GitHubIntelligence />
         </div>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="blog">
           <BlogPreview />
         </div>
-        <div data-reveal data-zigzag>
+        <div data-reveal data-zigzag data-voice-section="contact">
           <ContactSection />
         </div>
       </div>

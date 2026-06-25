@@ -67,7 +67,10 @@ async function resolveGeo(ip: string): Promise<VisitorGeo | null> {
 
     if (!response.ok) return null;
 
-    const data = (await response.json()) as {
+    const raw = await response.text();
+    if (!raw.trim()) return null;
+
+    const data = JSON.parse(raw) as {
       status?: string;
       country?: string | null;
       city?: string | null;

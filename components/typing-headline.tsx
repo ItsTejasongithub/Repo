@@ -20,19 +20,21 @@ export function TypingHeadline() {
       if (isEmpty)    { setDeleting(false); setIndex((v) => v + 1); return; }
       if (!deleting)  { setText(current.slice(0, text.length + 1)); return; }
       setText(current.slice(0, text.length - 1));
-    }, isComplete ? 1000 : isEmpty ? 380 : deleting ? 65 : 95);
+    }, isComplete ? 1300 : isEmpty ? 520 : deleting ? 85 : 125);
 
     return () => window.clearTimeout(timeout);
   }, [deleting, index, text]);
 
   return (
-    <span className="typing-slot relative block min-h-[5.5rem] max-w-full sm:min-h-[1.35em] lg:min-h-[2.8rem]">
+    <span className="typing-slot relative block min-h-[5.5rem] max-w-full text-center sm:min-h-[1.35em] lg:min-h-[2.8rem]">
       {/* invisible spacer keeps layout stable */}
-      <span aria-hidden="true" className="invisible absolute left-0 top-0">
+      <span aria-hidden="true" className="invisible block leading-tight lg:whitespace-nowrap">
         {longestPhrase}
       </span>
-      <span className="block leading-tight gradient-text lg:whitespace-nowrap">{text}</span>
-      <span className="inline-block h-5 w-[2px] animate-pulse bg-electric align-baseline sm:h-6" />
+      <span className="absolute inset-x-0 top-0 inline-flex items-baseline justify-center leading-tight lg:whitespace-nowrap">
+        <span className="gradient-text">{text}</span>
+        <span className="ml-2 inline-block h-[0.85em] w-[2px] animate-pulse bg-electric translate-y-[0.08em]" />
+      </span>
     </span>
   );
 }

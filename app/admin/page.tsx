@@ -2,8 +2,10 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { AdminLoginForm } from '@/components/admin-login-form';
 import { AdminLogoutButton } from '@/components/admin-logout-button';
+import { WelcomeSettingsForm } from '@/components/welcome-settings-form';
 import { getVisitorSummary } from '@/lib/visitor-store';
 import { verifyAdminSession } from '@/lib/admin-auth';
+import { getWelcomeSettings } from '@/lib/welcome-settings';
 import { ShieldCheck, MapPin, Globe2, Fingerprint, ArrowLeft } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -34,7 +36,10 @@ export default async function AdminPage() {
     );
   }
 
-  const summary = await getVisitorSummary();
+  const [summary, welcomeSettings] = await Promise.all([
+    getVisitorSummary(),
+    getWelcomeSettings(),
+  ]);
 
   return (
     <main className="container-pad py-10">
@@ -62,6 +67,10 @@ export default async function AdminPage() {
         <StatCard icon={<ShieldCheck className="h-5 w-5 text-electric" />} label="Total visits" value={summary.totalVisits} />
         <StatCard icon={<Globe2 className="h-5 w-5 text-electric" />} label="Unique countries" value={summary.uniqueCountries} />
         <StatCard icon={<Fingerprint className="h-5 w-5 text-electric" />} label="Unique IPs" value={summary.uniqueIps} />
+      </div>
+
+      <div className="mt-8">
+        <WelcomeSettingsForm initialSettings={welcomeSettings} />
       </div>
 
       <section className="mt-8 space-y-4">
