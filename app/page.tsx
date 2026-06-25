@@ -36,36 +36,43 @@ export default function Page() {
         {/* Bottom-right purple orb */}
         <div className="pointer-events-none absolute -bottom-32 -right-32 h-[420px] w-[420px] rounded-full bg-purple-500/[0.07] blur-[100px] z-0" />
 
-        <div className="container-pad relative z-10 grid min-h-screen items-center gap-8 py-10 sm:gap-10 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
+        <div className="relative z-10 flex flex-col min-h-screen">
 
-          {/* ── Left: text content ── */}
+          {/* ── Top: Avatar — takes the full upper portion ── */}
+          <div className="relative z-20 flex flex-1 items-end justify-center pt-16">
+            <HeroVisual />
+          </div>
+
+          {/* ── Bottom: Text content ── */}
           <div
-            className="relative z-20 space-y-6 text-center lg:space-y-8 lg:pr-10 lg:text-left"
+            className="relative z-20 container-pad space-y-6 text-center pb-14 pt-6"
             data-reveal
             data-zigzag
           >
-            {/* Status pill */}
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/75 backdrop-blur-sm">
-              <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.95)] animate-pulse" />
-              Real-time systems online
+            {/* Name + status row */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/75 backdrop-blur-sm">
+                <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_16px_rgba(110,231,183,0.95)] animate-pulse" />
+                Real-time systems online
+              </div>
+              <p className="text-xs uppercase tracking-[0.45em] text-electric/70">Tejas Kandi</p>
             </div>
 
             {/* Heading */}
-            <div className="space-y-4 sm:space-y-5">
-              <p className="text-xs uppercase tracking-[0.45em] text-electric/70">Tejas Kandi</p>
-              <h1 className="mx-auto max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:mx-0 lg:text-7xl">
+            <div className="space-y-3">
+              <h1 className="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
                 <span className="block text-white">Full-Stack Engineer building</span>
                 <span className="block min-h-[1.35em]">
                   <TypingHeadline />
                 </span>
               </h1>
-              <p className="mx-auto max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8 lg:mx-0">
+              <p className="mx-auto max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">
                 Building software, hardware and intelligent systems that operate in the real world.
               </p>
             </div>
 
             {/* Quick stats */}
-            <div className="flex flex-wrap justify-center gap-2.5 text-sm lg:justify-start">
+            <div className="flex flex-wrap justify-center gap-2.5 text-sm">
               {stats.slice(0, 4).map((s) => (
                 <div
                   key={s.label}
@@ -78,29 +85,24 @@ export default function Page() {
             </div>
 
             {/* CTA buttons */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
+            <div className="flex flex-wrap justify-center gap-3">
               <a
                 href="#contact"
-                className="group relative rounded-full px-7 py-3.5 text-center text-sm font-medium text-black transition hover:scale-[1.03] overflow-hidden"
+                className="rounded-full px-7 py-3.5 text-sm font-medium text-black transition hover:scale-[1.03]"
                 style={{
                   background: 'linear-gradient(130deg, #5ef0ff, #63d4ff 45%, #a78bfa)',
                   boxShadow: '0 0 24px rgba(94,240,255,0.3), 0 4px 16px rgba(0,0,0,0.3)',
                 }}
               >
-                <span className="relative z-10">Get in Touch</span>
+                Get in Touch
               </a>
               <a
                 href="#projects"
-                className="rounded-full border border-white/12 bg-white/[0.05] px-7 py-3.5 text-center text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/[0.09] hover:border-electric/30"
+                className="rounded-full border border-white/12 bg-white/[0.05] px-7 py-3.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/[0.09] hover:border-electric/30"
               >
                 Explore Projects
               </a>
             </div>
-          </div>
-
-          {/* ── Right: profile showcase ── */}
-          <div className="relative z-20" data-reveal data-parallax="0.18">
-            <HeroVisual />
           </div>
         </div>
       </section>

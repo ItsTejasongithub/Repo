@@ -1,6 +1,7 @@
 import { AnimatedCounter } from '@/components/animated-counter';
 import { skillGroups, stats, timeline, blogPosts } from '@/lib/site-data';
 import { ProjectCommandCenter } from '@/components/project-command-center';
+import { AvatarCanvas } from '@/components/AvatarCanvas';
 
 /* ─── Skill category colour maps (literal strings for Tailwind JIT) ─── */
 const groupAccent: Record<string, { dot: string; ring: string; bg: string; label: string }> = {
@@ -29,88 +30,20 @@ export function HeroVisual() {
         style={{ animationDelay: '2.5s' }}
       />
 
-      {/* Profile showcase — fixed square container */}
-      <div className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto aspect-square">
+      {/* Avatar container — large and centred, owns the top half */}
+      <div className="relative w-[92vw] max-w-[520px] sm:max-w-[680px] mx-auto h-[58vh] sm:h-[72vh]">
 
-        {/* ── Outermost orbit ring — slow counter-clockwise ── */}
-        <div className="absolute inset-0 orbit-ccw pointer-events-none">
-          <svg viewBox="0 0 380 380" className="w-full h-full" fill="none">
-            <defs>
-              <linearGradient id="rg1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"   stopColor="#5ef0ff" stopOpacity="0.65" />
-                <stop offset="50%"  stopColor="#8b5cf6" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#5ef0ff" stopOpacity="0.65" />
-              </linearGradient>
-            </defs>
-            <circle cx="190" cy="190" r="186" stroke="url(#rg1)" strokeWidth="1" strokeDasharray="14 18" />
-            <circle cx="190" cy="4" r="5" fill="#5ef0ff" opacity="0.9">
-              <animate attributeName="opacity" values="0.4;1;0.4" dur="3s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="376" cy="190" r="3.5" fill="#8b5cf6" opacity="0.75" />
-            <circle cx="190" cy="376" r="2.5" fill="#5ef0ff" opacity="0.5" />
-          </svg>
-        </div>
+        {/* Subtle ground shadow to anchor the avatar */}
+        <div className="pointer-events-none absolute bottom-10 left-1/2 -translate-x-1/2 h-10 w-48 rounded-full bg-cyan-400/20 blur-[22px]" />
 
-        {/* ── Middle orbit ring — clockwise ── */}
-        <div className="absolute inset-[28px] orbit-cw pointer-events-none">
-          <svg viewBox="0 0 324 324" className="w-full h-full" fill="none">
-            <circle cx="162" cy="162" r="158" stroke="rgba(139,92,246,0.22)" strokeWidth="0.75" strokeDasharray="5 26" />
-            <circle cx="162" cy="4" r="3" fill="#8b5cf6" opacity="0.65" />
-            <circle cx="320" cy="162" r="2" fill="#63d4ff" opacity="0.55" />
-          </svg>
-        </div>
-
-        {/* ── Profile image ── */}
-        <div
-          className="absolute inset-[54px] rounded-full scanner"
-          style={{
-            boxShadow:
-              '0 0 0 1.5px rgba(94,240,255,0.38), 0 0 40px rgba(94,240,255,0.18), 0 0 80px rgba(139,92,246,0.10), 0 22px 55px rgba(0,0,0,0.65)',
-            background: 'linear-gradient(135deg, rgba(94,240,255,0.08), rgba(139,92,246,0.08))',
-          }}
-        >
-          <img
-            src="/ProfileImage.svg"
-            alt="Tejas Kandi"
-            className="w-full h-full object-cover object-top rounded-full"
-            style={{ filter: 'saturate(1.04) contrast(1.02)' }}
-          />
-        </div>
+        {/* 3D Avatar — fills the container */}
+        <AvatarCanvas />
 
         {/* ── Status badge ── */}
         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-10">
           <div className="glass metal-border rounded-full px-4 py-1.5 text-xs text-emerald-300 flex items-center gap-2 whitespace-nowrap">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.9)] animate-pulse" />
             Available for work
-          </div>
-        </div>
-
-        {/* ── Floating badges (desktop only) ── */}
-        <div className="absolute top-[12%] -right-2 sm:-right-[68px] float-1 hidden sm:block z-10">
-          <div className="glass metal-border rounded-xl px-3 py-2 text-xs text-white/85 flex items-center gap-2">
-            <span className="text-electric text-base">⬡</span>
-            <span>Next.js 15</span>
-          </div>
-        </div>
-
-        <div className="absolute top-[38%] -left-2 sm:-left-[72px] float-2 hidden sm:block z-10">
-          <div className="glass metal-border rounded-xl px-3 py-2 text-xs text-white/85 flex items-center gap-2">
-            <span className="text-purple-400">◆</span>
-            <span>FastAPI</span>
-          </div>
-        </div>
-
-        <div className="absolute bottom-[28%] -right-2 sm:-right-[68px] float-3 hidden sm:block z-10">
-          <div className="glass metal-border rounded-xl px-3 py-2 text-xs text-white/85 flex items-center gap-2">
-            <span className="text-emerald-400">●</span>
-            <span>Production</span>
-          </div>
-        </div>
-
-        <div className="absolute bottom-[12%] -left-2 sm:-left-[68px] float-4 hidden sm:block z-10">
-          <div className="glass metal-border rounded-xl px-3 py-2 text-xs text-white/85 flex items-center gap-2">
-            <span className="text-cyan-300">▲</span>
-            <span>AI Systems</span>
           </div>
         </div>
       </div>

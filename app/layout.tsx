@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description:
     'Premium engineering portfolio featuring real-time systems, AI workflows, embedded projects, and production-grade delivery.',
   metadataBase: new URL('https://tejaskandi.dev'),
+  manifest: '/site.webmanifest',
   openGraph: {
     title: 'Tejas Kandi Portfolio',
     description: 'A futuristic engineering command center portfolio.',

@@ -4,3 +4,11 @@ node_modules
 .env.local
 .env.development
 .env.production
+
+# Dev server logs & build caches
+.next-dev.stderr.log
+.next-dev.stdout.log
+*.tsbuildinfo
+
+# Local tooling
+.claude/
