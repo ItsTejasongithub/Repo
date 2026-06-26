@@ -328,8 +328,6 @@ export function MotionRuntime() {
       };
     }
 
-    startAudio();
-
     // Unlock audio context only when user clicks the "Begin" button
     const onPortfolioBegin = async () => {
       if (!soundEnabledRef.current) return;

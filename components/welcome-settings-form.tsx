@@ -22,6 +22,7 @@ export function WelcomeSettingsForm({ initialSettings }: { initialSettings: Welc
   const [settings, setSettings] = useState(initialSettings);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [state, setState] = useState<SaveState>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!('speechSynthesis' in window)) return;
@@ -43,6 +44,7 @@ export function WelcomeSettingsForm({ initialSettings }: { initialSettings: Welc
   const updateSettings = (next: Partial<WelcomeSettings>) => {
     setSettings((current) => ({ ...current, ...next }));
     setState('idle');
+    setErrorMessage(null);
   };
 
   const updateSectionPrompt = (
@@ -56,6 +58,7 @@ export function WelcomeSettingsForm({ initialSettings }: { initialSettings: Welc
       ),
     }));
     setState('idle');
+    setErrorMessage(null);
   };
 
   const preview = (text = settings.text) => {
@@ -77,6 +80,7 @@ export function WelcomeSettingsForm({ initialSettings }: { initialSettings: Welc
 
   const save = async () => {
     setState('saving');
+    setErrorMessage(null);
     const response = await fetch('/api/admin/welcome-settings', {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
@@ -84,6 +88,8 @@ export function WelcomeSettingsForm({ initialSettings }: { initialSettings: Welc
     });
 
     if (!response.ok) {
+      const payload = await response.json().catch(() => null) as { error?: string } | null;
+      setErrorMessage(payload?.error ?? `Save failed with status ${response.status}.`);
       setState('error');
       return;
     }
@@ -249,7 +255,11 @@ export function WelcomeSettingsForm({ initialSettings }: { initialSettings: Welc
           Preview voice
         </button>
         {state === 'saved' && <span className="text-sm text-emerald-300">Saved.</span>}
-        {state === 'error' && <span className="text-sm text-red-300">Could not save settings.</span>}
+        {state === 'error' && (
+          <span className="text-sm text-red-300">
+            {errorMessage ?? 'Could not save settings.'}
+          </span>
+        )}
       </div>
     </section>
   );

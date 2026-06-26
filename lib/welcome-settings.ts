@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'fs/promises';
 import path from 'path';
 
 export type WelcomeVoiceStyle = 'soft-male' | 'neutral' | 'soft-female' | 'browser-default';
@@ -21,8 +21,10 @@ export type WelcomeSettings = {
   sectionPrompts: SectionVoicePrompt[];
 };
 
-const STORE_DIR = path.join(process.cwd(), 'data');
-const STORE_PATH = path.join(STORE_DIR, 'welcome-settings.json');
+const STORE_PATH = process.env.WELCOME_SETTINGS_STORE_PATH
+  ? path.resolve(process.env.WELCOME_SETTINGS_STORE_PATH)
+  : path.join(process.cwd(), 'data', 'welcome-settings.json');
+const STORE_DIR = path.dirname(STORE_PATH);
 
 export const defaultWelcomeSettings: WelcomeSettings = {
   enabled: true,
@@ -43,6 +45,8 @@ export const defaultWelcomeSettings: WelcomeSettings = {
     { id: 'contact', label: 'Contact', enabled: true, text: 'You can reach out here for direct collaboration.' },
   ],
 };
+
+let cachedSettings: WelcomeSettings = defaultWelcomeSettings;
 
 function sanitizeSettings(input: Partial<WelcomeSettings>): WelcomeSettings {
   const allowedStyles: WelcomeVoiceStyle[] = ['soft-male', 'neutral', 'soft-female', 'browser-default'];
@@ -92,15 +96,19 @@ export async function getWelcomeSettings(): Promise<WelcomeSettings> {
     const raw = await readFile(STORE_PATH, 'utf8');
     if (!raw.trim()) return defaultWelcomeSettings;
     const parsed = JSON.parse(raw) as Partial<WelcomeSettings>;
-    return sanitizeSettings({ ...defaultWelcomeSettings, ...parsed });
+    cachedSettings = sanitizeSettings({ ...defaultWelcomeSettings, ...parsed });
+    return cachedSettings;
   } catch {
-    return defaultWelcomeSettings;
+    return cachedSettings;
   }
 }
 
 export async function saveWelcomeSettings(input: Partial<WelcomeSettings>) {
   const settings = sanitizeSettings(input);
   await ensureStore();
-  await writeFile(STORE_PATH, JSON.stringify(settings, null, 2), 'utf8');
+  const tmpPath = `${STORE_PATH}.${process.pid}.${Date.now()}.tmp`;
+  await writeFile(tmpPath, JSON.stringify(settings, null, 2), 'utf8');
+  await rename(tmpPath, STORE_PATH);
+  cachedSettings = settings;
   return settings;
 }

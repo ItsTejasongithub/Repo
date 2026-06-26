@@ -16,7 +16,11 @@ export async function GET() {
   }
 
   const settings = await getWelcomeSettings();
-  return NextResponse.json(settings);
+  return NextResponse.json(settings, {
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+    },
+  });
 }
 
 export async function PUT(request: Request) {
@@ -41,15 +45,27 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Invalid settings payload.' }, { status: 400 });
   }
 
-  const settings = await saveWelcomeSettings({
-    enabled: typeof body.enabled === 'boolean' ? body.enabled : undefined,
-    text: typeof body.text === 'string' ? body.text : undefined,
-    voiceStyle: typeof body.voiceStyle === 'string' ? body.voiceStyle as WelcomeVoiceStyle : undefined,
-    voiceName: typeof body.voiceName === 'string' ? body.voiceName : null,
-    motionSoundMode: typeof body.motionSoundMode === 'string' ? body.motionSoundMode as MotionSoundMode : undefined,
-    sectionVoiceEnabled: typeof body.sectionVoiceEnabled === 'boolean' ? body.sectionVoiceEnabled : undefined,
-    sectionPrompts: Array.isArray(body.sectionPrompts) ? body.sectionPrompts as SectionVoicePrompt[] : undefined,
-  });
+  try {
+    const settings = await saveWelcomeSettings({
+      enabled: typeof body.enabled === 'boolean' ? body.enabled : undefined,
+      text: typeof body.text === 'string' ? body.text : undefined,
+      voiceStyle: typeof body.voiceStyle === 'string' ? body.voiceStyle as WelcomeVoiceStyle : undefined,
+      voiceName: typeof body.voiceName === 'string' ? body.voiceName : null,
+      motionSoundMode: typeof body.motionSoundMode === 'string' ? body.motionSoundMode as MotionSoundMode : undefined,
+      sectionVoiceEnabled: typeof body.sectionVoiceEnabled === 'boolean' ? body.sectionVoiceEnabled : undefined,
+      sectionPrompts: Array.isArray(body.sectionPrompts) ? body.sectionPrompts as SectionVoicePrompt[] : undefined,
+    });
 
-  return NextResponse.json(settings);
+    return NextResponse.json(settings, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unable to persist settings.';
+    return NextResponse.json(
+      { error: message },
+      { status: 500, headers: { 'Cache-Control': 'no-store, max-age=0' } },
+    );
+  }
 }
