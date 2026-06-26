@@ -1,4 +1,5 @@
 import { mkdir, readFile, rename, writeFile } from 'fs/promises';
+import os from 'os';
 import path from 'path';
 
 export type WelcomeVoiceStyle = 'soft-male' | 'neutral' | 'soft-female' | 'browser-default';
@@ -21,10 +22,11 @@ export type WelcomeSettings = {
   sectionPrompts: SectionVoicePrompt[];
 };
 
-const STORE_PATH = process.env.WELCOME_SETTINGS_STORE_PATH
+const PRIMARY_STORE_PATH = process.env.WELCOME_SETTINGS_STORE_PATH
   ? path.resolve(process.env.WELCOME_SETTINGS_STORE_PATH)
   : path.join(process.cwd(), 'data', 'welcome-settings.json');
-const STORE_DIR = path.dirname(STORE_PATH);
+const FALLBACK_STORE_PATH = path.join(os.tmpdir(), 'welcome-settings.json');
+const STORE_DIR = path.dirname(PRIMARY_STORE_PATH);
 
 export const defaultWelcomeSettings: WelcomeSettings = {
   enabled: true,
@@ -91,24 +93,49 @@ async function ensureStore() {
   await mkdir(STORE_DIR, { recursive: true });
 }
 
+async function writeAtomicJson(targetPath: string, settings: WelcomeSettings) {
+  const dir = path.dirname(targetPath);
+  await mkdir(dir, { recursive: true });
+  const tmpPath = path.join(
+    dir,
+    `${path.basename(targetPath)}.${process.pid}.${Date.now()}.tmp`,
+  );
+  await writeFile(tmpPath, JSON.stringify(settings, null, 2), 'utf8');
+  await rename(tmpPath, targetPath);
+}
+
 export async function getWelcomeSettings(): Promise<WelcomeSettings> {
   try {
-    const raw = await readFile(STORE_PATH, 'utf8');
+    const raw = await readFile(PRIMARY_STORE_PATH, 'utf8');
     if (!raw.trim()) return defaultWelcomeSettings;
     const parsed = JSON.parse(raw) as Partial<WelcomeSettings>;
     cachedSettings = sanitizeSettings({ ...defaultWelcomeSettings, ...parsed });
     return cachedSettings;
   } catch {
-    return cachedSettings;
+    try {
+      const raw = await readFile(FALLBACK_STORE_PATH, 'utf8');
+      if (!raw.trim()) return cachedSettings;
+      const parsed = JSON.parse(raw) as Partial<WelcomeSettings>;
+      cachedSettings = sanitizeSettings({ ...defaultWelcomeSettings, ...parsed });
+      return cachedSettings;
+    } catch {
+      return cachedSettings;
+    }
   }
 }
 
 export async function saveWelcomeSettings(input: Partial<WelcomeSettings>) {
   const settings = sanitizeSettings(input);
-  await ensureStore();
-  const tmpPath = `${STORE_PATH}.${process.pid}.${Date.now()}.tmp`;
-  await writeFile(tmpPath, JSON.stringify(settings, null, 2), 'utf8');
-  await rename(tmpPath, STORE_PATH);
+  try {
+    await writeAtomicJson(PRIMARY_STORE_PATH, settings);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    if (!message.includes('EROFS')) {
+      throw error;
+    }
+
+    await writeAtomicJson(FALLBACK_STORE_PATH, settings);
+  }
   cachedSettings = settings;
   return settings;
 }
